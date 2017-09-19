@@ -1,0 +1,22 @@
+{
+  "name": "http-task-manager",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "mocha --recursive --require ./test/bootstrap.js -t 5000",
+    "deploy": "sls deploy --region eu-central-1 --stage $1"
+  },
+  "author": "Alexandros Fotiadis",
+  "devDependencies": {
+    "aws-sdk": "^2.110.0",
+    "chai": "^4.1.2",
+    "mocha": "^3.5.0",
+    "nock": "^9.0.14",
+    "serverless": "^1.21.0"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "joi": "^10.6.0",
+    "request": "^2.82.0",
+    "uuid": "^3.1.0"
+  }
+}

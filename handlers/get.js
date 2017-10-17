@@ -23,13 +23,13 @@ function handler(event, context, callback) {
       return taskService.getResult(task.id)
         .catch((err) => {
           if (err instanceof NotFoundError) {
-            return {task, result: null};
+            return null;
           } else {
             throw err;
           }
         })
     })
-    .then((result) => callback(null, result))
+    .then((response) => callback(null, response))
     .catch((error) => callback(error, null))
 }
 

@@ -17,6 +17,20 @@ provider:
     TASK_RESULTS_TABLE:
       Ref: TaskResults
 functions:
+  run:
+    handler: handlers/run.handler
+  stream:
+    handler: handlers/stream.handler
+    timeout: 300
+    environment:
+      RUN_FUNCTION_NAME: ${self:service}-${opt:stage}-run
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt: [Tasks, StreamArn]
+          batchSize: 50
+          enabled: true
   add:
     handler: handlers/add.handler
     events:
@@ -37,8 +51,6 @@ functions:
           request:
             template:
               application/json: '{"id": "$input.params(''id'')"}'
-  update:
-    handler: handlers/update.handler
 
 resources:
   Resources:

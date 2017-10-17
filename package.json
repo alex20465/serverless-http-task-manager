@@ -8,12 +8,10 @@
   "author": "Alexandros Fotiadis",
   "devDependencies": {
     "aws-sdk": "^2.110.0",
-    "chai": "^4.1.2",
-    "mocha": "^3.5.0",
-    "nock": "^9.0.14",
     "serverless": "^1.21.0"
   },
   "dependencies": {
+    "dynamodb-data-types": "^3.0.0",
     "bluebird": "^3.5.0",
     "joi": "^10.6.0",
     "request": "^2.82.0",

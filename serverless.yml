@@ -19,11 +19,18 @@ provider:
 functions:
   run:
     handler: handlers/run.handler
+    timeout: 3
+  callback:
+    handler: handlers/callback.handler
+    timeout: 3
   stream:
     handler: handlers/stream.handler
     timeout: 300
     environment:
+      MAX_TRIES: 2
+      RETRY_INTERVAL: 2000
       RUN_FUNCTION_NAME: ${self:service}-${opt:stage}-run
+      CALLBACK_FUNCTION_NAME: ${self:service}-${opt:stage}-run
     events:
       - stream:
           type: dynamodb

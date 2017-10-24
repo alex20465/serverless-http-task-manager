@@ -2,14 +2,19 @@ const Joi = require('joi');
 const validate = require('../lib/validate');
 
 const eventSchema = Joi.object({
-  id: Joi.string().required(),
-  handlerEndpoint: Joi.string().uri().required(),
-  handlerBody: Joi.string(),
-  callbackEndpoint: Joi.string().uri().required()
+  task: Joi.object({
+    id: Joi.string().required(),
+    handlerEndpoint: Joi.string().uri().required(),
+    callbackEndpoint: Joi.string().uri().required(),
+  }).options({skipUnknown: true}).required(),
+  result: Joi.object({
+    handlerStatusCode: Joi.number().required(),
+    result: Joi.string().required()
+  }).options({skipUnknown: true}).required()
 }).required();
 
 /**
- * @param {Task} event
+ * @param {{task: Task, result: TaskResult}} event
  * @param {null} context
  * @param {function(Error, (TaskResult|null))} callback
  */
@@ -17,12 +22,7 @@ function handler(event, context, callback) {
   validate.validateEventSchema(event, eventSchema)
     .then(() => {
       // todo: implement endpoint call
-      return {
-        id: event.id,
-        handlerStatusCode: 200,
-        callbackStatusCode: 200,
-        result: 'Mock'
-      }
+      return Object.assign({callbackStatusCode: 200}, event.result);
     })
     .then((result) => {
       setTimeout(() => callback(null, result), 9000);

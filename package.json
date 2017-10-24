@@ -11,8 +11,9 @@
     "serverless": "^1.21.0"
   },
   "dependencies": {
-    "dynamodb-data-types": "^3.0.0",
     "bluebird": "^3.5.0",
+    "bluebird-retry": "^0.11.0",
+    "dynamodb-data-types": "^3.0.0",
     "joi": "^10.6.0",
     "request": "^2.82.0",
     "uuid": "^3.1.0"

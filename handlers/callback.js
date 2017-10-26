@@ -1,32 +1,27 @@
 const Joi = require('joi');
 const validate = require('../lib/validate');
+const taskService = require('../lib/task');
 
 const eventSchema = Joi.object({
-  task: Joi.object({
-    id: Joi.string().required(),
-    handlerEndpoint: Joi.string().uri().required(),
-    callbackEndpoint: Joi.string().uri().required(),
-  }).options({skipUnknown: true}).required(),
-  result: Joi.object({
-    handlerStatusCode: Joi.number().required(),
-    result: Joi.string().required()
-  }).options({skipUnknown: true}).required()
+  task: taskService.schemas.TaskSchema.required(),
+  requestResponse: taskService.schemas.ResponseSchema.required(),
 }).required();
 
 /**
- * @param {{task: Task, result: TaskResult}} event
+ * @param {{task: Task, requestResponse: Response}} event
  * @param {null} context
- * @param {function(Error, (TaskResult|null))} callback
+ * @param {function(Error, (Response|null))} callback
  */
 function handler(event, context, callback) {
   validate.validateEventSchema(event, eventSchema)
     .then(() => {
-      // todo: implement endpoint call
-      return Object.assign({callbackStatusCode: 200}, event.result);
+      return {
+        statusCode: 200,
+        body: '{}',
+        headers: [{key: 'accept/type', value: 'application/text'}]
+      }
     })
-    .then((result) => {
-      setTimeout(() => callback(null, result), 9000);
-    })
+    .then((response) => callback(null, response))
     .catch((err) => callback(err, null));
 }
 

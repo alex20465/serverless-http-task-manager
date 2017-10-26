@@ -8,11 +8,8 @@ const taskService = require('../lib/task');
  * @typedef {Task} AddResponse
  */
 
-const eventSchema = Joi.object({
+const eventSchema = taskService.schemas.TaskSchema.keys({
   id: Joi.string().forbidden().default(() => uuid.v4(), 'auto generated UUID'),
-  handlerEndpoint: Joi.string().uri().required(),
-  handlerBody: Joi.string(),
-  callbackEndpoint: Joi.string().uri().required()
 }).required();
 
 /**

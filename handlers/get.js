@@ -1,6 +1,6 @@
 const Joi = require('joi');
 const taskService = require('../lib/task');
-const {validateEventSchema} = require('../lib/validate');
+const validate = require('../lib/validate');
 const {NotFoundError} = require('../errors');
 
 /**
@@ -17,7 +17,7 @@ const eventSchema = Joi.object({id: Joi.string().required()}).required();
  * @param {function(Error, (GetResponse|null))} callback
  */
 function handler(event, context, callback) {
-  validateEventSchema(event, eventSchema)
+  validate.validateEventSchema(event, eventSchema)
     .then(({id}) => taskService.get(id))
     .then((task) => {
       return taskService.getResult(task.id)

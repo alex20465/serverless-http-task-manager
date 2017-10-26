@@ -45,46 +45,48 @@ function handler(event, context, callback) {
  * @return {Promise<TaskResult>}
  */
 function execute(task) {
-  return executeHandler(task)
-    .then((result) => executeCallback(task, result));
-}
+  let requestResponse;
 
+  return executeHandler(task)
+    .then((response) => {
+      requestResponse = response;
+      return executeCallback(task, requestResponse);
+    })
+    .then((callbackResponse) => {
+      return {id: task.id, callbackResponse, requestResponse}
+    })
+}
 /**
  * @param {Task} task
- * @param {TaskResult} result
+ * @param {Response} requestResponse
  * @returns Promise<TaskResult>
  */
-function executeCallback(task, result) {
-  console.log('Perform callback', JSON.stringify({task, result}));
-  const payload = {task, result};
+function executeCallback(task, requestResponse) {
+  console.log('Perform callback', JSON.stringify({task, requestResponse}));
+  const payload = {task, requestResponse};
   return PromiseRetry(() => invokeLambda(CALLBACK_FUNCTION_NAME, payload), retryOptions)
-    .then((callbackResult) => {
-      return Object.assign(callbackResult, result);
-    })
-    .catch(() => {
-      return Object.assign({callbackStatusCode: -1}, result);
-    })
+    .catch((err) => ({statusCode: -1, body: err.message}));
 }
 
 /**
  * @param {Task} record
- * @returns {Promise<TaskResult>}
+ * @returns {Promise<Response>}
  */
 function executeHandler(record) {
   console.log('Perform task execution', JSON.stringify(record));
   return PromiseRetry(() => invokeLambda(RUN_FUNCTION_NAME, record), retryOptions)
     .catch((err) => {
       return {
-        id: record.id,
-        handlerStatusCode: -1,
-        result: err.message
+        statusCode: -1,
+        body: err.message,
+        headers: [{key: "Accept", value: "application/json"}]
       }
     })
 }
 
 /**
  * @param {any} event
- * @param {Tasks[]} events
+ * @param {Task[]} events
  */
 function extractRecords(event, events) {
   return event.Records

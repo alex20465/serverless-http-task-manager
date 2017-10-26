@@ -30,7 +30,7 @@ functions:
       MAX_TRIES: 2
       RETRY_INTERVAL: 2000
       RUN_FUNCTION_NAME: ${self:service}-${opt:stage}-run
-      CALLBACK_FUNCTION_NAME: ${self:service}-${opt:stage}-run
+      CALLBACK_FUNCTION_NAME: ${self:service}-${opt:stage}-callback
     events:
       - stream:
           type: dynamodb

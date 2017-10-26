@@ -17,11 +17,11 @@ provider:
     TASK_RESULTS_TABLE:
       Ref: TaskResults
 functions:
-  run:
-    handler: handlers/run.handler
+  executeTaskRequest:
+    handler: handlers/executeTaskRequest.handler
     timeout: 3
-  callback:
-    handler: handlers/callback.handler
+  executeTaskCallback:
+    handler: handlers/executeTaskCallback.handler
     timeout: 3
   stream:
     handler: handlers/stream.handler
@@ -29,8 +29,8 @@ functions:
     environment:
       MAX_TRIES: 2
       RETRY_INTERVAL: 2000
-      RUN_FUNCTION_NAME: ${self:service}-${opt:stage}-run
-      CALLBACK_FUNCTION_NAME: ${self:service}-${opt:stage}-callback
+      RUN_FUNCTION_NAME: ${self:service}-${opt:stage}-executeTaskRequest
+      CALLBACK_FUNCTION_NAME: ${self:service}-${opt:stage}-executeTaskCallback
     events:
       - stream:
           type: dynamodb
@@ -38,22 +38,22 @@ functions:
             Fn::GetAtt: [Tasks, StreamArn]
           batchSize: 50
           enabled: true
-  add:
-    handler: handlers/add.handler
+  addTask:
+    handler: handlers/addTask.handler
     events:
       - http:
           method: POST
-          path: add
+          path: task/add
           integration: lambda
           request:
             template:
               application/json: '$input.body'
-  get:
-    handler: handlers/get.handler
+  getTaskResult:
+    handler: handlers/getTaskResult.handler
     events:
       - http:
           method: GET
-          path: get/{id}
+          path: task/result/{id}
           integration: lambda
           request:
             template:

@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const validate = require('../lib/validate');
 const taskService = require('../lib/task');
+const {request} = require('../lib/request');
 
 const eventSchema = Joi.object({
   task: taskService.schemas.TaskSchema.required(),
@@ -14,13 +15,11 @@ const eventSchema = Joi.object({
  */
 function handler(event, context, callback) {
   validate.validateEventSchema(event, eventSchema)
-    .then(() => {
-      return {
-        statusCode: 200,
-        body: '{}',
-        headers: [{key: 'accept/type', value: 'application/text'}]
-      }
-    })
+    .then(() => request({
+      uri: event.task.callback.uri,
+      headers: event.task.callback.headers,
+      body: JSON.stringify(event.requestResponse)
+    }))
     .then((response) => callback(null, response))
     .catch((err) => callback(err, null));
 }

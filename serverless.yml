@@ -10,19 +10,26 @@ provider:
       Action:
         - dynamodb:*
         - lambda:*
+        - s3:PutObject
       Resource: '*'
   environment:
     TASKS_TABLE:
       Ref: Tasks
     TASK_RESULTS_TABLE:
       Ref: TaskResults
+    RESPONSE_BUCKET:
+      Ref: ResponseBucket
 functions:
   executeTaskRequest:
     handler: handlers/executeTaskRequest.handler
-    timeout: 3
+    timeout: 7
+    environment:
+      MAX_RESPONSE_SIZE: 500
   executeTaskCallback:
     handler: handlers/executeTaskCallback.handler
-    timeout: 3
+    timeout: 7
+    environment:
+      MAX_RESPONSE_SIZE: 500
   stream:
     handler: handlers/stream.handler
     timeout: 300
@@ -91,3 +98,7 @@ resources:
           WriteCapacityUnits: 5
         StreamSpecification:
           StreamViewType: NEW_IMAGE
+    ResponseBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:service}-${opt:stage}-responses

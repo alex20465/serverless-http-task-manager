@@ -1,6 +1,6 @@
 const validate = require('../lib/validate');
 const taskService = require('../lib/task');
-
+const {request, saveResponse} = require('../lib/request');
 const eventSchema = taskService.schemas.TaskSchema.required();
 
 /**
@@ -10,15 +10,9 @@ const eventSchema = taskService.schemas.TaskSchema.required();
  */
 function handler(event, context, callback) {
   validate.validateEventSchema(event, eventSchema)
-    .then(() => {
-      // todo: implement endpoint call
-      return {
-        statusCode: 200,
-        body: 'OK',
-        headers: [{"Accept": "application/json"}]
-      }
-    })
-    .then((result) => setTimeout(() => callback(null, result), 9000))
+    .then(() => request(event.request))
+    .then((response) => saveResponse(response))
+    .then((result) => callback(null, result))
     .catch((err) => callback(err, null));
 }
 

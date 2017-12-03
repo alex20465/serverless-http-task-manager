@@ -18,7 +18,8 @@ function handler(event, context, callback) {
     .then(() => request({
       uri: event.task.callback.uri,
       headers: event.task.callback.headers,
-      body: JSON.stringify(event.requestResponse)
+      method: event.task.callback.method,
+      body: JSON.stringify(Object.assign({id: event.task.id}, event.requestResponse))
     }))
     .then((response) => callback(null, response))
     .catch((err) => callback(err, null));

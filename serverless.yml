@@ -19,17 +19,16 @@ provider:
       Ref: TaskResults
     RESPONSE_BUCKET:
       Ref: ResponseBucket
+    MAX_HEADERS: 30
+    MAX_HEADER_VALUE_SIZE: 500
+    MAX_RESPONSE_SIZE: 1500
 functions:
   executeTaskRequest:
     handler: handlers/executeTaskRequest.handler
     timeout: 7
-    environment:
-      MAX_RESPONSE_SIZE: 500
   executeTaskCallback:
     handler: handlers/executeTaskCallback.handler
     timeout: 7
-    environment:
-      MAX_RESPONSE_SIZE: 500
   stream:
     handler: handlers/stream.handler
     timeout: 300

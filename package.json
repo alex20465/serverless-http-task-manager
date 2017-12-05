@@ -10,9 +10,16 @@
     "aws-sdk": "^2.110.0",
     "chai": "^4.1.2",
     "chai-subset": "^1.6.0",
+    "eslint": "^4.12.1",
+    "eslint-config-prettier": "^2.8.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-mocha": "^4.11.0",
+    "eslint-plugin-prettier": "^2.3.1",
+    "eslint-plugin-promise": "^3.6.0",
     "mocha": "^4.0.1",
     "mocka": "0.0.1",
     "nock": "^9.0.25",
+    "prettier": "^1.9.0",
     "serverless": "^1.21.0"
   },
   "dependencies": {

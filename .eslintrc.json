@@ -19,7 +19,6 @@
       "import/no-extraneous-dependencies": "error",
       "mocha/no-exclusive-tests": "error",
       "promise/always-return": "error",
-      "promise/no-nesting": "warn",
       "no-template-curly-in-string": "error",
       "curly": "error",
       "no-console": "off",

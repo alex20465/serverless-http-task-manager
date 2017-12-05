@@ -1,12 +1,13 @@
-const {expect} = require('chai');
-const {request} = require('../../lib/request');
+const { expect } = require('chai');
+const { request } = require('../../lib/request');
 
 describe('lib.request', () => {
   describe('POST - google.com', () => {
     let response;
     before(() => {
-      return request({uri: 'http://www.google.com', method: 'post'})
-        .then((res) => (response = res));
+      return request({ uri: 'http://www.google.com', method: 'post' }).then(
+        res => (response = res)
+      );
     });
 
     it('should return statusCode 200', () => {
@@ -21,9 +22,9 @@ describe('lib.request', () => {
       expect(response.headers).to.containSubset([
         {
           key: 'content-type',
-          value: 'text/html; charset=UTF-8'
-        }
+          value: 'text/html; charset=UTF-8',
+        },
       ]);
-    })
+    });
   });
 });

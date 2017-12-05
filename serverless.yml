@@ -23,11 +23,29 @@ provider:
     MAX_HEADER_VALUE_SIZE: 500
     MAX_RESPONSE_SIZE: 1500
 functions:
+  asyncTaskCallback:
+    handler: handlers/asyncTaskCallback.handler
+    timeout: 7
+    environment:
+      MAX_TRIES: 2
+      RETRY_INTERVAL: 2000
+      CALLBACK_FUNCTION_NAME: ${self:service}-${opt:stage}-executeTaskCallback
+    events:
+      - http:
+          method: post
+          path: task/callback/{taskId}
+          integration: lambda
+          request:
+            template:
+              application/json: '{"taskId": "$input.params(''taskId'')", "body": "$util.escapeJavaScript($input.json(''$..*''))"}'
+  executeTaskCallback:
+    handler: handlers/executeTaskCallback.handler
+    timeout: 7
   executeTaskRequest:
     handler: handlers/executeTaskRequest.handler
     timeout: 7
-  executeTaskCallback:
-    handler: handlers/executeTaskCallback.handler
+  receiveTaskCallback:
+    handler: handlers/receiveTaskCallback.handler
     timeout: 7
   stream:
     handler: handlers/stream.handler

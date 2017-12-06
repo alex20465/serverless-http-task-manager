@@ -22,6 +22,7 @@
       "no-template-curly-in-string": "error",
       "curly": "error",
       "no-console": "off",
+      "promise/no-callback-in-promise": "off",
       "no-empty-function": "error",
       "no-lone-blocks": "error",
       "require-jsdoc": "error",

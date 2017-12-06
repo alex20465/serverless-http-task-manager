@@ -21,17 +21,15 @@ function handler(event, context, callback) {
   validate
     .validateEventSchema(event, eventSchema)
     .then(({ id }) => taskService.get(id))
-    .then(task => {
-      return taskService.getResult(task.id).catch(err => {
-        if (err instanceof NotFoundError) {
-          return null;
-        } else {
-          throw err;
-        }
-      });
-    })
+    .then(task => taskService.getResult(task.id))
     .then(response => callback(null, response))
-    .catch(error => callback(error, null));
+    .catch(error => {
+      if (error instanceof NotFoundError) {
+        callback(null, null);
+      } else {
+        callback(error, null);
+      }
+    });
 }
 
 module.exports = { handler };

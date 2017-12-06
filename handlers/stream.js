@@ -1,10 +1,16 @@
-const {AttributeValue} = require('dynamodb-data-types');
+const { AttributeValue } = require('dynamodb-data-types');
 const Promise = require('bluebird');
 const PromiseRetry = require('bluebird-retry');
-const {invokeLambda} = require('../lib/invokeLambda');
-const {putResults} = require('../lib/task');
+const { invokeLambda } = require('../lib/invokeLambda');
+const { putResults } = require('../lib/task');
 
-const {MAX_TRIES, RETRY_INTERVAL, RUN_FUNCTION_NAME, CALLBACK_FUNCTION_NAME, ASYNC_CALLBACK_ENDPOINT} = process.env;
+const {
+  MAX_TRIES,
+  RETRY_INTERVAL,
+  RUN_FUNCTION_NAME,
+  CALLBACK_FUNCTION_NAME,
+  ASYNC_CALLBACK_ENDPOINT,
+} = process.env;
 
 const retryOptions = {
   max_tries: parseInt(MAX_TRIES),
@@ -52,13 +58,12 @@ function execute(task) {
 function executeAsync(task) {
   task.request.headers.push({
     key: 'x-callback-endpoint',
-    value: `${ASYNC_CALLBACK_ENDPOINT}/${task.id}`
+    value: `${ASYNC_CALLBACK_ENDPOINT}/${task.id}`,
   });
-  return executeHandler(task)
-    .then(requestResponse => {
-      // task is in-processing, there is no callback yet
-      return {id: task.id, callbackResponse: null, requestResponse};
-    });
+  return executeHandler(task).then(requestResponse => {
+    // task is in-processing, there is no callback yet
+    return { id: task.id, callbackResponse: null, requestResponse };
+  });
 }
 
 /**
@@ -74,7 +79,7 @@ function executeAwait(task) {
       return executeCallback(task, requestResponse);
     })
     .then(callbackResponse => {
-      return {id: task.id, callbackResponse, requestResponse};
+      return { id: task.id, callbackResponse, requestResponse };
     });
 }
 
@@ -85,10 +90,10 @@ function executeAwait(task) {
  * @returns {void}
  */
 function executeCallback(task, requestResponse) {
-  console.log('Perform callback', JSON.stringify({task, requestResponse}));
-  const payload = {task, requestResponse};
+  console.log('Perform callback', JSON.stringify({ task, requestResponse }));
+  const payload = { task, requestResponse };
   return PromiseRetry(() => invokeLambda(CALLBACK_FUNCTION_NAME, payload), retryOptions).catch(
-    err => ({statusCode: -1, body: err.message})
+    err => ({ statusCode: -1, body: err.message })
   );
 }
 
@@ -102,7 +107,7 @@ function executeHandler(record) {
     return {
       statusCode: -1,
       body: err.message,
-      headers: [{key: 'Accept', value: 'application/json'}],
+      headers: [{ key: 'Accept', value: 'application/json' }],
     };
   });
 }
@@ -118,4 +123,4 @@ function extractRecords(event, events) {
   );
 }
 
-module.exports = {handler};
+module.exports = { handler };

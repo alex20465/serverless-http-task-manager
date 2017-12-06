@@ -1,7 +1,7 @@
 const { AttributeValue } = require('dynamodb-data-types');
 const Promise = require('bluebird');
 const PromiseRetry = require('bluebird-retry');
-const { invokeLambda } = require('../lib/invokeLambda');
+const { invokeLambda, invokeLambdaAsync } = require('../lib/invokeLambda');
 const { putResults } = require('../lib/task');
 
 const {
@@ -52,6 +52,8 @@ function execute(task) {
 }
 
 /**
+ * Perform the asynchronouse optimistic request.
+ *
  * @param {Task} task
  * @returns {Promise<TaskResult>}
  */
@@ -60,13 +62,18 @@ function executeAsync(task) {
     key: 'x-callback-endpoint',
     value: `${ASYNC_CALLBACK_ENDPOINT}/${task.id}`,
   });
-  return executeHandler(task).then(requestResponse => {
-    // task is in-processing, there is no callback yet
-    return { id: task.id, callbackResponse: null, requestResponse };
+  return executeHandlerAsync(task).then(() => {
+    return {
+      id: task.id,
+      callbackResponse: null, // waiting for event to callback
+      requestResponse: { statusCode: -2, body: null }, // optimistic request reponse
+    };
   });
 }
 
 /**
+ * Perform the await execution and callback direct after response is available.
+ *
  * @param {Task} task
  * @return {Promise<TaskResult>}
  */
@@ -84,6 +91,8 @@ function executeAwait(task) {
 }
 
 /**
+ * Execute callback with the request-response as task-results.
+ *
  * @param {Task} task
  * @param {Response} requestResponse
  * @returns Promise<TaskResult>
@@ -98,6 +107,8 @@ function executeCallback(task, requestResponse) {
 }
 
 /**
+ * Execute task handler and return the response.
+ *
  * @param {Task} record
  * @returns {Promise<Response>}
  */
@@ -110,6 +121,19 @@ function executeHandler(record) {
       headers: [{ key: 'Accept', value: 'application/json' }],
     };
   });
+}
+
+/**
+ * Execute the task handler asynchronously.
+ *
+ * @param {Task} record
+ * @returns {Promise<null>}
+ */
+function executeHandlerAsync(record) {
+  console.log('Perform task execution', JSON.stringify(record));
+  return PromiseRetry(() => invokeLambdaAsync(RUN_FUNCTION_NAME, record), retryOptions).then(
+    () => null
+  );
 }
 
 /**

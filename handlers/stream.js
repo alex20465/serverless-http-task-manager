@@ -1,3 +1,6 @@
+/**
+ * @Todo: Disallow empty header names and values
+ */
 const { AttributeValue } = require('dynamodb-data-types');
 const Promise = require('bluebird');
 const PromiseRetry = require('bluebird-retry');
@@ -83,7 +86,11 @@ function executeAwait(task) {
   return executeHandler(task)
     .then(response => {
       requestResponse = response;
-      return executeCallback(task, requestResponse);
+      if (task.callback) {
+        return executeCallback(task, requestResponse);
+      } else {
+        return null;
+      }
     })
     .then(callbackResponse => {
       return { id: task.id, callbackResponse, requestResponse };
